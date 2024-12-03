@@ -92,7 +92,7 @@ def givepoints():
     global currentupgrades
     global keyamountmultiplier
     if (rushActive):
-        points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))*(currentupgrades[2]*10)
+        points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))*(currentupgrades[2]*10)*(currentupgrades[4]+1)
     #                       multiplier              moreClicks                   #rush
     else:
         points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))
@@ -116,6 +116,7 @@ def update(dt):
     global rentactive
     global rentmaxtimer
     global rentgrow
+    global losttimer
     # Point add
     if (getkeynum() != None):
         pressedkey = getkeynum()
@@ -151,7 +152,6 @@ def update(dt):
     
     if (renttimer > 0 and rentactive):
         renttimer -=1
-        print(renttimer)
     elif (rentactive):
         points -= rentamount 
         rentamount = rentamount*rentgrow
@@ -161,7 +161,6 @@ def update(dt):
             lost = True
     elif (points > 10):
         rentactive = True
-        print("Rent activated")
 
     if(keys[key.H]):
         rentmaxtimer = 0 
@@ -173,8 +172,10 @@ def update(dt):
 
     if(keys[key.ESCAPE]):
         pyglet.app.exit()
-    # if (losttimer > 0 and lost = True):
-    #     pass
+    if(losttimer > 0 and lost == True):
+        losttimer -= 1
+    elif(lost == True):
+        reset()
 
     
 pyglet.clock.schedule_interval(update, 0.1)
@@ -185,6 +186,10 @@ def on_draw():
     global shopindex
     global rushActive
     global rentactive
+    global rentamount
+    global renttimer
+    global lost
+    global losttimer
     window.clear()
     if (lost == False):
         pointsBox = pyglet.text.Label( f"Points:\n{points.__round__(2)}",
@@ -214,13 +219,13 @@ def on_draw():
             rushBox = pyglet.text.Label( f"Rush Active", 
             font_name='Times New Roman',
             font_size=36,
-            x=window.width//2, y=window.height - 50,
+            x=window.width - 500, y=window.height - 50,
             anchor_x='center', anchor_y='center')
             rushBox.color = (255, 0, 0, 255)
             rushBox.draw()
         
         if (rentactive):
-            rentBox = pyglet.text.Label( f"Rent Due: {rentamount.__round__(2)}, in {renttimer} seconds",
+            rentBox = pyglet.text.Label( f"Rent Due: {rentamount.__round__(2)} points in {renttimer/10} seconds",
             font_name='Times New Roman',
             font_size=12,
             # top left corner 
@@ -234,7 +239,7 @@ def on_draw():
             x=window.width//2, y=window.height//2,
             anchor_x='center', anchor_y='center')
         lostBox.draw()
-        resetBox = pyglet.text.Label( f"Press R to restart",
+        resetBox = pyglet.text.Label( f"Resetting in {losttimer/10} seconds",
             font_name='Times New Roman',
             font_size=36,
             x=window.width//2, y=window.height//2 - 50,
