@@ -1,4 +1,3 @@
-import keyboard
 import time
 import random
 import pyglet
@@ -11,11 +10,11 @@ fps_display = pyglet.window.FPSDisplay(window=window)
 target = 0
 global points
 global currentupgrades
-global keyToPress
+global lastkeypressed
 global shopitemscost
 points = 0
 
-keyToPress = key.W
+lastkeypressed = 0
 
 shopindex = 0
 shopitems = ["multipliere", "moreClicks", "rush"]
@@ -24,19 +23,19 @@ priceFactor = [1.1, 1.2, 1.3]
 currentupgrades = [0, 0, 0]
 
 def getkeynum():
-    if(keyboard.is_pressed("w")):
+    if(keys[key.W]):
         return 0
-    if(keyboard.is_pressed("a")):
-        return 1
-    if(keyboard.is_pressed("s")):
-        return 2
-    if(keyboard.is_pressed("d")):
-        return 3
-    if(keyboard.is_pressed("e")):
+    if(keys[key.A]):
+         return 1
+    if(keys[key.S]):
+         return 2
+    if(keys[key.D]):
+         return 3
+    if(keys[key.E]):
         return 4
-    if(keyboard.is_pressed("f")):
+    if(keys[key.F]):
         return 5
-    if(keyboard.is_pressed("g")):
+    if(keys[key.G]):
         return 6
     
 def newPrice():
@@ -53,18 +52,12 @@ def givepoints():
     
 def update(dt):
     global points
-    global keyToPress
+    global lastkeypressed
     global shopindex
     # Point add
-    if keys[key.W]:
-        if keyToPress == key.W:
-            givepoints()
-            keyToPress = key.S
-    
-    if keys[key.S]:
-        if keyToPress == key.S:
-            givepoints()
-            keyToPress = key.W
+    if (getkeynum() != None and getkeynum() !=lastkeypressed):
+        givepoints()
+        lastkeypressed = getkeynum()
             
     if keys[key.LEFT]:
         if(shopindex > 0):
