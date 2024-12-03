@@ -21,6 +21,7 @@ shopitems = ["multipliere", "moreClicks", "rush"]
 shopitemscost = [1, 2, 3]
 priceFactor = [1.1, 1.2, 1.3]
 currentupgrades = [0, 0, 0]
+keyamountmultiplier = [1, 1 ,1, 1 ,1 ,1, 7]
 
 def getkeynum():
     if(keys[key.W]):
@@ -44,11 +45,12 @@ def newPrice():
     currentPriceFactor = priceFactor[shopindex]
     shopitemscost[shopindex] = int(shopitemscost[shopindex]*currentPriceFactor)
     
-def givepoints():
+def givepoints(keyindex):
     global points
     global currentupgrades
-    #                       multiplier              moreClicks
-    points += 1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1)
+    global keyamountmultiplier
+    #                       multiplier              moreClicks              #difrent per key
+    points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))*keyamountmultiplier[keyindex]
     
 def update(dt):
     global points
@@ -56,7 +58,7 @@ def update(dt):
     global shopindex
     # Point add
     if (getkeynum() != None and getkeynum() !=lastkeypressed):
-        givepoints()
+        givepoints(getkeynum())
         lastkeypressed = getkeynum()
             
     if keys[key.LEFT]:
