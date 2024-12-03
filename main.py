@@ -12,7 +12,13 @@ global points
 global currentupgrades
 global lastkeypressed
 global shopitemscost
+global rushActive
+global rushCooldown
+global rushTime
 points = 0
+rushActive = False
+rushTime = 0
+rushCooldown = 300
 
 lastkeypressed = 0
 
@@ -49,10 +55,22 @@ def givepoints(keyindex):
     global points
     global currentupgrades
     global keyamountmultiplier
-    #                       multiplier              moreClicks              #difrent per key
-    points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))*keyamountmultiplier[keyindex]
+    if (rushActive):
+        points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))*keyamountmultiplier[keyindex]*(currentupgrades[2]*10)
+    #                       multiplier              moreClicks              #difrent per key                    #rush
+    else:
+        points += (1*(pow(1.1, currentupgrades[0]))*(currentupgrades[1]+1))*keyamountmultiplier[keyindex]
+
+def setrush():
+    global rushTime
+    global rushActive
+    rushTime = 150
+    rushActive = True
     
 def update(dt):
+    global rushActive
+    global rushTime
+    global rushCooldown
     global points
     global lastkeypressed
     global shopindex
@@ -74,7 +92,21 @@ def update(dt):
             points -= shopitemscost[shopindex]
             currentupgrades[shopindex] += 1
             shopitemscost[shopindex] += 1
+            if (shopindex == 2 and currentupgrades[2] == 1):
+                setrush()
+            
             newPrice()
+
+    if (rushTime > 0):
+        rushTime -= 1
+    elif (currentupgrades[2] >= 1):
+        rushActive = False
+        if(rushCooldown <= 0):
+            setrush()
+            rushCooldown = random.randint(300, 600)
+        else:
+            rushCooldown -= 1
+            print(rushCooldown)
     
 pyglet.clock.schedule_interval(update, 0.1)
 @window.event
@@ -82,6 +114,7 @@ def on_draw():
     global points
     global keyToPress
     global shopindex
+    global rushActive
     window.clear()
     pointsBox = pyglet.text.Label( str(points),
         font_name='Times New Roman',
@@ -103,10 +136,17 @@ def on_draw():
         x=window.width//2, y=window.height//2 - 50,
         anchor_x='center', anchor_y='center')
     upgradeCountBox.draw()
+    if (rushActive):
+        rushBox = pyglet.text.Label( f"Rush Active", 
+        font_name='Times New Roman',
+        font_size=36,
+        x=window.width//2, y=window.height//2 - 100,
+        anchor_x='center', anchor_y='center')
+        rushBox.color = (255, 0, 0, 255)
+        rushBox.draw()
     
     fps_display.draw()
 
 pyglet.app.run()
-
 
 window.set_visible()
